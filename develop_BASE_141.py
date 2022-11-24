@@ -1,7 +1,7 @@
 import make_vacancies
 import make_pdf
 
-inputed = input("Введите слово Вакансии или Статистика: ")
+inputed = input("Вакансии или Статистика: ")
 
 if inputed == "Вакансии":
     make_vacancies.StartProcess()

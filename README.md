@@ -33,3 +33,5 @@ year, month, day = big.split('-')
 new_data = int(year)
 
 ![image](https://user-images.githubusercontent.com/103418173/205277745-0d87b4f5-2efc-4b2e-a15c-75fbb6cbd656.png)
+
+Таким образом самый быстрый способ преобразования строки - обрезание строки с помощью ".".join(date[:4].split("-")). Его и оставляем

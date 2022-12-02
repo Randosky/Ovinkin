@@ -12,3 +12,6 @@
 
 2.3.3
 
+Преобразование даты и времени с помощью datetime.strptime
+
+![image](https://user-images.githubusercontent.com/103418173/205270583-4f1c67f6-fa27-46fd-a85b-f7795ca672c0.png)

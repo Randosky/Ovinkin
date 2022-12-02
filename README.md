@@ -12,12 +12,12 @@
 
 2.3.3
 
-1-й вариант: Преобразование даты и времени с помощью datetime.strptime
+1-й вариант: Преобразование даты и времени с помощью datetime.strptime(date, '%Y-%m-%dT%H:%M:%S%z').strftime("%Y")
 
 ![image](https://user-images.githubusercontent.com/103418173/205270583-4f1c67f6-fa27-46fd-a85b-f7795ca672c0.png)
 
-2-й вариант:
+2-й вариант: Преобразование даты и времени с помощью обрезания строки ".".join(date[:4].split("-"))
 
-ф
+![image](https://user-images.githubusercontent.com/103418173/205272001-a97040c5-665c-46b5-860c-5e12850196b0.png)
 
 3-й вариант: 

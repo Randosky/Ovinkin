@@ -28,9 +28,9 @@
 
 Преобразование даты и времени с помощью:
 
-big, small = date[:19].split('T')
-year, month, day = big.split('-')
-new_data = int(year)
+big, small = date[:19].split('T') 
+year, month, day = big.split('-') 
+new_data = int(year) 
 
 ![image](https://user-images.githubusercontent.com/103418173/205277745-0d87b4f5-2efc-4b2e-a15c-75fbb6cbd656.png)
 

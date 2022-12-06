@@ -35,3 +35,15 @@ new_data = int(year)
 ![image](https://user-images.githubusercontent.com/103418173/205277745-0d87b4f5-2efc-4b2e-a15c-75fbb6cbd656.png)
 
 Таким образом самый быстрый способ преобразования строки - обрезание строки с помощью ".".join(date[:4].split("-")). Его и оставляем
+
+3.2.1
+
+Созданные csv файлы
+
+![image](https://user-images.githubusercontent.com/103418173/205935474-1054d3d2-fd7f-4d03-95c1-e8c22109aca9.png)
+
+Соответствие колонок файлов
+
+![image](https://user-images.githubusercontent.com/103418173/205935556-08cb09b7-f893-49f7-8cf4-bfc8ef828e87.png)
+
+![image](https://user-images.githubusercontent.com/103418173/205935609-82ab07d1-9a2a-483f-a38f-e64ceeb7bd0d.png)

@@ -59,3 +59,11 @@ new_data = int(year)
 ![image](https://user-images.githubusercontent.com/103418173/205935556-08cb09b7-f893-49f7-8cf4-bfc8ef828e87.png)
 
 ![image](https://user-images.githubusercontent.com/103418173/205935609-82ab07d1-9a2a-483f-a38f-e64ceeb7bd0d.png)
+
+
+
+3.2.2
+
+Без многопроцессорной обработки
+
+С многопроцессорной обработкой

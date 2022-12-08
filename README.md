@@ -83,3 +83,5 @@ new_data = int(year)
 Многопроцессорная обработка с помощью Concurrent futures всего кода выполнилась за 8.918 секунд
 
 ![image](https://user-images.githubusercontent.com/103418173/206534124-58418363-23f0-4df4-9d97-3e6f6df2ec67.png)
+
+Значит по итогу мы оставляем решение с Concurrent futures

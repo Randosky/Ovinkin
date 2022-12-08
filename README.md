@@ -64,6 +64,8 @@ new_data = int(year)
 
 3.2.2
 
+
+
 Без многопроцессорной обработки весь код выполнился за 18.840 секунд
 
 ![image](https://user-images.githubusercontent.com/103418173/206158509-d5149fa2-6e36-40e2-8fe2-8ff68efffc9e.png)
@@ -72,3 +74,12 @@ new_data = int(year)
 
 ![image](https://user-images.githubusercontent.com/103418173/206159829-b27e988b-978a-4e66-bacf-b2fa3cc8c496.png)
 
+
+
+3.2.3
+
+
+
+Многопроцессорная обработка с помощью Concurrent futures всего кода выполнилась за 8.918 секунд
+
+![image](https://user-images.githubusercontent.com/103418173/206534124-58418363-23f0-4df4-9d97-3e6f6df2ec67.png)

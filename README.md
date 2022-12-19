@@ -85,3 +85,11 @@ new_data = int(year)
 ![image](https://user-images.githubusercontent.com/103418173/206534124-58418363-23f0-4df4-9d97-3e6f6df2ec67.png)
 
 Значит по итогу мы оставляем решение с Concurrent futures
+
+
+
+3.3.1
+
+Частотность подсчитаная двумя способами
+
+![image](https://user-images.githubusercontent.com/103418173/208423143-dd7f7530-7aa1-4f8b-8872-7306f07a1a70.png)

@@ -93,3 +93,12 @@ new_data = int(year)
 Частотность подсчитаная двумя способами
 
 ![image](https://user-images.githubusercontent.com/103418173/208423143-dd7f7530-7aa1-4f8b-8872-7306f07a1a70.png)
+
+
+
+3.3.3
+
+Получившийся датафрейм
+
+![image](https://user-images.githubusercontent.com/103418173/208748010-fc4e605b-c8bb-493e-8e57-13acc1b1fcc9.png)
+

@@ -29,7 +29,7 @@ for year in range(2003, 2023):
                 months.append(f"{month}/{year}")
 
 for i in range(len(months)):
-    url = f"https://www.cbr.ru/scripts/XML_daily.asp?date_req=02/{months[i]}d=1"
+    url = f"https://www.cbr.ru/scripts/XML_daily.asp?date_req=15/{months[i]}d=1"
     response = requests.get(url)
     cur_df = pd.read_xml(response.text)
     cur_filtered_df = cur_df.loc[cur_df['CharCode'].isin(["BYN", "BYR", "EUR", "KZT", "UAH", "USD"])]

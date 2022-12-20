@@ -53,6 +53,6 @@ for i in range(len(months)):
     UAH = UAH_v / UAH_n
     USD = USD_v / USD_n
 
-    df_api_currency[i] = [months[i], BYR, EUR, KZT, UAH, USD]
+    df_api_currency.loc[i] = [months[i], BYR, EUR, KZT, UAH, USD]
 
 df_api_currency.to_csv("CB_Currency.csv", index=False)

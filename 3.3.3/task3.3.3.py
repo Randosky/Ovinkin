@@ -21,10 +21,13 @@ df = pd.DataFrame(columns=["name", "salary_from", "salary_to", "salary_currency"
 # Находим количество страниц, идем по каждой странице, берем все вакансии на странице и идём по всем вакансиям
 for url in all_urls:
     pages = requests.get(url).json()
-    for page in range(pages["pages"]):
-        params = {'page': page}
+    for page in range(pages["pages"] + 1):
+        if pages["per_page"] < 100:
+            params = {'page': page}
+        else:
+            params = {'per_page': '100', 'page': page}
         vacancies_response = requests.get(url, params=params)
-        vacancies_json = requests.get(url, params=params).json()
+        vacancies_json = vacancies_response.json()
         vacancies_items = vacancies_json["items"]
         for vacancy in vacancies_items:
             try:

@@ -55,19 +55,6 @@
 {%- endfor %}
 {%- endmacro %}
 
-<!--Макрос, чтобы заполнить вторую табличку-->
-{% macro get_by_area(dicts_by_area) -%}
-{% for i in range(dicts_by_area[0] | length) -%}
-    <tr>
-        <td>{{ keys_0_area[i] }}</td>
-        <td>{{ values_0_area[i] }}</td>
-        <td class="noBorder"></td>
-        <td>{{ keys_1_area[i] }}</td>
-        <td>{{ ((values_1_area[i] * 100)|round(2))|string + "%" }}</td>
-    </tr>
-{%- endfor %}
-{%- endmacro %}
-
 <h2>Статистика по годам</h2>
 <table>
     <tr>
@@ -78,18 +65,6 @@
         <th>Количество вакансий - {{ name }}</th>
     </tr>
     {{ get_by_year(by_year) }}
-</table>
-
-<h2>Статистика по городам</h2>
-<table>
-    <tr>
-        <th>Город</th>
-        <th>Уровень зарплат</th>
-        <th class="noBorder"></th>
-        <th>Город</th>
-        <th>Доля вакансий</th>
-    </tr>
-    {{ get_by_area(by_area) }}
 </table>
 </body>
 </html>

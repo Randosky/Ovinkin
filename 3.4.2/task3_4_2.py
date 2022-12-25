@@ -67,36 +67,25 @@ if __name__ == "__main__":
     class Report:
         rows_by_year = ["Год", "Средняя зарплата", "Средняя зарплата - ", "Количество вакансий",
                         "Количество вакансий - "]
-        rows_by_area = ["Город", "Уровень зарплат", "", "Город", "Доля вакансий"]
 
-        def __init__(self, vac_name, dicts_by_year, dicts_by_area, vac_with_others):
-            self.generate_image(vac_name, dicts_by_year, dicts_by_area, vac_with_others)
-            self.generate_pdf(vac_name, dicts_by_year, dicts_by_area)
+        def __init__(self, vac_name, dicts_by_year):
+            self.generate_image(vac_name, dicts_by_year)
+            self.generate_pdf(vac_name, dicts_by_year)
 
         @staticmethod
-        def generate_pdf(vac_name, dicts_by_year, dicts_by_area):
+        def generate_pdf(vac_name, dicts_by_year):
             env = Environment(loader=FileSystemLoader('.'))
             template = env.get_template("pdf_template.html")
 
             pdf_template = template.render(
-                {'name': vac_name, 'by_year': dicts_by_year, 'by_area': dicts_by_area,
-                 'keys_0_area': list(dicts_by_area[0].keys()), 'values_0_area': list(dicts_by_area[0].values()),
-                 'keys_1_area': list(dicts_by_area[1].keys()), 'values_1_area': list(dicts_by_area[1].values())})
+                {'name': vac_name, 'by_year': dicts_by_year})
 
             options = {'enable-local-file-access': None}
             config = pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe')
             pdfkit.from_string(pdf_template, 'report.pdf', configuration=config, options=options)
 
         @staticmethod
-        def generate_image(vac_name, dicts_by_year, dicts_by_area, vac_with_others):
-            y1_cities = np.arange(len(dicts_by_area[0].keys()))
-            y1_cities_names = {}
-            for key, value in dicts_by_area[0].items():
-                if "-" in key or " " in key:
-                    key = key.replace("-", "-\n")
-                    key = key.replace(" ", "\n")
-                y1_cities_names[key] = value
-
+        def generate_image(vac_name, dicts_by_year):
             x_nums = np.arange(len(dicts_by_year[0].keys()))
             width = 0.4
             x_list1 = x_nums - width / 2
@@ -121,27 +110,6 @@ if __name__ == "__main__":
             ax.legend(fontsize=8)
             ax.grid(True, axis="y")
 
-            ax = fig.add_subplot(223)
-            ax.set_title("Уровень зарплат по городам")
-            width = 0.8
-            ax.barh(y1_cities, dicts_by_area[0].values(), width, align="center")
-            ax.set_yticks(y1_cities, labels=y1_cities_names.keys(), horizontalalignment="right",
-                          verticalalignment="center")
-            ax.tick_params(axis="x", labelsize=8)
-            ax.tick_params(axis="y", labelsize=6)
-            ax.xaxis.set_major_locator(ticker.MultipleLocator(40000))
-            ax.invert_yaxis()
-            ax.grid(True, axis="x")
-
-            ax = fig.add_subplot(224)
-            ax.set_title("Доля вакансий по городам")
-            dicts_by_area[1]["Другие"] = vac_with_others
-            ax.pie(dicts_by_area[1].values(), labels=dicts_by_area[1].keys(), textprops={'size': 6},
-                   colors=["#ff8006", "#28a128", "#1978b5", "#0fbfd0", "#bdbe1c", "#808080", "#e478c3", "#8d554a",
-                           "#9567be",
-                           "#d72223", "#1978b5", "#ff8006"])
-            ax.axis('equal')
-
             plt.tight_layout()
             plt.savefig("graph.png")
 
@@ -155,19 +123,7 @@ if __name__ == "__main__":
     df["published_at"] = df["published_at"].apply(lambda date: int(".".join(date[:4].split("-"))))
     df['salary'] = df.loc[:, ['salary_from', 'salary_to']].mean(axis=1)
 
-    vacancies = len(df)
-    df["count"] = df.groupby("area_name")['area_name'].transform("count")
-    df_norm = df[df['count'] >= 0.01 * vacancies]
-    others = len(df[df['count'] < 0.01 * vacancies]) / vacancies
-    cities = list(df_norm["area_name"].unique())
-
-    salaries_by_year, vacancies_by_year, inp_vacancy_salary, inp_vacancy_count, salaries_areas, vacancies_areas \
-        = {}, {}, {}, {}, {}, {}
-
-    for city in cities:
-        df_s = df_norm[df_norm['area_name'] == city]
-        salaries_areas[city] = int(df_s['salary'].mean())
-        vacancies_areas[city] = round(len(df_s) / len(df), 4)
+    salaries_by_year, vacancies_by_year, inp_vacancy_salary, inp_vacancy_count = {}, {}, {}, {}
 
     executor = futures.ProcessPoolExecutor()
     processes = []
@@ -183,11 +139,8 @@ if __name__ == "__main__":
     print("Динамика количества вакансий по годам:", sort_dict(vacancies_by_year))
     print("Динамика уровня зарплат по годам для выбранной профессии:", sort_dict(inp_vacancy_salary))
     print("Динамика количества вакансий по годам для выбранной профессии:", sort_dict(inp_vacancy_count))
-    print("Уровень зарплат по городам (в порядке убывания):", sort_area_dict(salaries_areas))
-    print("Доля вакансий по городам (в порядке убывания):", sort_area_dict(vacancies_areas))
 
     dicts_list_by_year = [sort_dict(salaries_by_year), sort_dict(vacancies_by_year),
                           sort_dict(inp_vacancy_salary), sort_dict(inp_vacancy_count)]
-    dicts_list_by_area = [sort_area_dict(salaries_areas), sort_area_dict(vacancies_areas)]
 
-    report = Report(inputed.vacancy_name, dicts_list_by_year, dicts_list_by_area, others)
+    report = Report(inputed.vacancy_name, dicts_list_by_year)

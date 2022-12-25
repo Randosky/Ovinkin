@@ -545,5 +545,4 @@ for data in all_vac_data:
     parsed_data.get_vac_data(static, inputed.vacancy_name)
 
 static.print_result(inputed.vacancy_name)
-
 report = Report(inputed.vacancy_name, static.dicts_list_by_year, static.dicts_list_by_area, static.vac_with_others)

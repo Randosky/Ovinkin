@@ -1,4 +1,9 @@
 *.csv
+*.h2.db
+*.db
 .idea
 /venv
 /.idea
+!CB_Currency.csv
+!New_vacancies_with_dif_currencies.csv
+!Vacancies_by_HH.csv

@@ -102,3 +102,10 @@ new_data = int(year)
 
 ![image](https://user-images.githubusercontent.com/103418173/208748010-fc4e605b-c8bb-493e-8e57-13acc1b1fcc9.png)
 
+
+
+3.5.1
+
+Получившаяся база данных
+
+![image](https://user-images.githubusercontent.com/103418173/209650963-d1434996-2586-425c-8af1-cbc76de47486.png)

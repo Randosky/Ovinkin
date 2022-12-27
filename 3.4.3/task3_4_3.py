@@ -1,3 +1,5 @@
+import math
+from statistics import mean
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -17,6 +19,25 @@ def sort_dict(dictionary):
     for key in sorted(dictionary):
         sorted_dict[key] = dictionary[key]
     return sorted_dict
+
+
+def get_salary(s_from, s_to, s_cur, date):
+    date = date[1] + "/" + date[0]
+    s_cur_value = 0
+
+    if s_cur != "RUR" and (s_cur == s_cur) and s_cur in ["BYN", "BYR", "EUR", "KZT", "UAH", "USD"]:
+        s_cur.replace("BYN", "BYR")
+        df_date_row = df_date.loc[df_date["date"] == date]
+        s_cur_value = df_date_row[s_cur].values[0]
+    elif s_cur == "RUR":
+        s_cur_value = 1
+
+    if math.isnan(s_from) and not (math.isnan(s_to)):
+        return s_to * s_cur_value
+    elif not (math.isnan(s_from)) and math.isnan(s_to):
+        return s_from * s_cur_value
+    elif not (math.isnan(s_from)) and not (math.isnan(s_to)):
+        return mean([s_from, s_to]) * s_cur_value
 
 
 class UserInput:
@@ -70,7 +91,8 @@ class Report:
 
         ax = fig.add_subplot(222)
         ax.set_title("Количество вакансий по годам")
-        ax.bar(x_list1, dicts_by_year[1].values(), width, label=f"Количество вакансий \n{vac_name.lower()} {region.lower()}")
+        ax.bar(x_list1, dicts_by_year[1].values(), width,
+               label=f"Количество вакансий \n{vac_name.lower()} {region.lower()}")
         ax.set_xticks(x_nums, dicts_by_year[1].keys(), rotation="vertical")
         ax.tick_params(axis="both", labelsize=8)
         ax.legend(fontsize=8)
@@ -83,7 +105,7 @@ class Report:
         ax.set_yticks(y1_cities, labels=y1_cities_names.keys(), horizontalalignment="right", verticalalignment="center")
         ax.tick_params(axis="x", labelsize=8)
         ax.tick_params(axis="y", labelsize=6)
-        ax.xaxis.set_major_locator(ticker.MultipleLocator(40000))
+        ax.xaxis.set_major_locator(ticker.MultipleLocator(100000))
         ax.invert_yaxis()
         ax.grid(True, axis="x")
 
@@ -103,12 +125,16 @@ class Report:
 inputed = UserInput()
 file, vac, reg = inputed.file_name, inputed.vacancy_name, inputed.region
 df = pd.read_csv(file)
-df["published_at"] = df["published_at"].apply(lambda date: int(".".join(date[:4].split("-"))))
-years = list(df["published_at"].unique())
-df['salary'] = df.loc[:, ['salary_from', 'salary_to']].mean(axis=1)
-df_vac = df[df["name"].str.contains(vac)]
+
+df["years"] = df["published_at"].apply(lambda date: int(".".join(date[:4].split("-"))))
+years = list(df["years"].unique())
 
 salaries_areas, vacancies_areas, inp_vacancy_salary, inp_vacancy_count = {}, {}, {}, {}
+
+# Преобразование валют
+df_date = pd.read_csv("CB_Currency.csv")
+df["salary"] = df.apply(lambda row: get_salary(row["salary_from"], row["salary_to"], row["salary_currency"],
+                                               row["published_at"][:7].split("-")), axis=1)
 
 # По городам
 vacancies = len(df)
@@ -123,8 +149,9 @@ for city in cities:
     vacancies_areas[city] = round(len(df_s) / len(df), 4)
 
 # По годам и региону
+df_vac = df[df["name"].str.contains(vac)]
 for year in years:
-    df_v_s = df_vac[(df_vac['published_at'] == year) & (df_vac['area_name'] == reg)]
+    df_v_s = df_vac[(df_vac['years'] == year) & (df_vac['area_name'] == reg)]
     if not df_v_s.empty:
         inp_vacancy_salary[year] = int(df_v_s['salary'].mean())
         inp_vacancy_count[year] = len(df_v_s)

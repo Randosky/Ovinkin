@@ -1,10 +1,15 @@
+import math
 from concurrent import futures
+from statistics import mean
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from jinja2 import Environment, FileSystemLoader
 import pdfkit
 from matplotlib import ticker
+
+df_date = pd.read_csv("CB_Currency.csv")
 
 
 def start_processes(arguments):
@@ -13,7 +18,8 @@ def start_processes(arguments):
     pr_df = pd.read_csv(f'created_csv_files\\part_{year}.csv')
 
     # применить вычисление построчно
-    pr_df.loc[:, 'salary'] = pr_df.loc[:, ['salary_from', 'salary_to']].mean(axis=1)
+    pr_df["salary"] = pr_df.apply(lambda row: get_salary(row["salary_from"], row["salary_to"], row["salary_currency"],
+                                                         row["published_at"][:7].split("-")), axis=1)
 
     # вакансии по заданному названию профессии
     pr_df_vac = pr_df[pr_df["name"].str.contains(vac_name)]
@@ -29,6 +35,25 @@ def start_processes(arguments):
     return d_list
 
 
+def get_salary(s_from, s_to, s_cur, date):
+    date = date[1] + "/" + date[0]
+    s_cur_value = 0
+
+    if s_cur != "RUR" and (s_cur == s_cur) and s_cur in ["BYN", "BYR", "EUR", "KZT", "UAH", "USD"]:
+        s_cur.replace("BYN", "BYR")
+        df_date_row = df_date.loc[df_date["date"] == date]
+        s_cur_value = df_date_row[s_cur].values[0]
+    elif s_cur == "RUR":
+        s_cur_value = 1
+
+    if math.isnan(s_from) and not (math.isnan(s_to)):
+        return s_to * s_cur_value
+    elif not (math.isnan(s_from)) and math.isnan(s_to):
+        return s_from * s_cur_value
+    elif not (math.isnan(s_from)) and not (math.isnan(s_to)):
+        return mean([s_from, s_to]) * s_cur_value
+
+
 if __name__ == "__main__":
     def sort_dict(dictionary):
         sorted_dict = {}
@@ -41,6 +66,25 @@ if __name__ == "__main__":
         sorted_tuples = sorted(dictionary.items(), key=lambda item: item[1], reverse=True)[:10]
         sorted_dict = {k: v for k, v in sorted_tuples}
         return sorted_dict
+
+
+    def get_salary(s_from, s_to, s_cur, date):
+        date = date[1] + "/" + date[0]
+        s_cur_value = 0
+
+        if s_cur != "RUR" and (s_cur == s_cur) and s_cur in ["BYN", "BYR", "EUR", "KZT", "UAH", "USD"]:
+            s_cur.replace("BYN", "BYR")
+            df_date_row = df_date.loc[df_date["date"] == date]
+            s_cur_value = df_date_row[s_cur].values[0]
+        elif s_cur == "RUR":
+            s_cur_value = 1
+
+        if math.isnan(s_from) and not (math.isnan(s_to)):
+            return s_to * s_cur_value
+        elif not (math.isnan(s_from)) and math.isnan(s_to):
+            return s_from * s_cur_value
+        elif not (math.isnan(s_from)) and not (math.isnan(s_to)):
+            return mean([s_from, s_to]) * s_cur_value
 
 
     class UserInput:
@@ -120,8 +164,8 @@ if __name__ == "__main__":
     df = make_csv.dataframe
     years = make_csv.years
 
-    df["published_at"] = df["published_at"].apply(lambda date: int(".".join(date[:4].split("-"))))
-    df['salary'] = df.loc[:, ['salary_from', 'salary_to']].mean(axis=1)
+    df["salary"] = df.apply(lambda row: get_salary(row["salary_from"], row["salary_to"], row["salary_currency"],
+                                                   row["published_at"][:7].split("-")), axis=1)
 
     salaries_by_year, vacancies_by_year, inp_vacancy_salary, inp_vacancy_count = {}, {}, {}, {}
 
@@ -140,7 +184,7 @@ if __name__ == "__main__":
     print("Динамика уровня зарплат по годам для выбранной профессии:", sort_dict(inp_vacancy_salary))
     print("Динамика количества вакансий по годам для выбранной профессии:", sort_dict(inp_vacancy_count))
 
-    dicts_list_by_year = [sort_dict(salaries_by_year), sort_dict(vacancies_by_year),
-                          sort_dict(inp_vacancy_salary), sort_dict(inp_vacancy_count)]
+    dicts_list_by_year = [sort_dict(salaries_by_year), sort_dict(inp_vacancy_salary),
+                          sort_dict(vacancies_by_year), sort_dict(inp_vacancy_count)]
 
     report = Report(inputed.vacancy_name, dicts_list_by_year)

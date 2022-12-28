@@ -30,6 +30,7 @@ con = sqlite3.connect("CB_Currency.db")
 cur = con.cursor()
 
 df["published_at"] = df["published_at"].apply(lambda date: date[:7])
+df["years"] = df["published_at"].apply(lambda date: date[:4])
 df.insert(1, "salary", df.apply(lambda row: get_salary(row["salary_from"], row["salary_to"], row["salary_currency"],
                                                        row["published_at"].split("-")), axis=1))
 df.drop(["salary_from", "salary_to", "salary_currency"], axis=1, inplace=True)

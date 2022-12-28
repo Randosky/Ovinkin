@@ -10,49 +10,53 @@ def sort_area_dict(dictionary):
     return sorted_dict
 
 
-def sort_dict(dictionary):
-    sorted_dict = {}
-    for key in sorted(dictionary):
-        sorted_dict[key] = dictionary[key]
-    return sorted_dict
-
-
 print("Используемая база данных: new_vac_with_dif_currencies.db")
 vac = input("Введите название профессии: ")
+vac = f"%{vac}%"
 con = sqlite3.connect("new_vac_with_dif_currencies.db")
 cur = con.cursor()
-df = pd.read_sql("SELECT * From new_vac_with_dif_currencies", con)
-df["published_at"] = df["published_at"].apply(lambda date: date[:4])
-years = list(df["published_at"].unique())
+database_length = pd.read_sql("SELECT COUNT(*) From new_vac_with_dif_currencies", con).to_dict()["COUNT(*)"][0]
 
-salaries_by_year, vacancies_by_year, inp_vacancy_salary, inp_vacancy_count, salaries_areas, vacancies_areas \
-        = {}, {}, {}, {}, {}, {}
+# Динамика уровня зарплат по годам
+s_groups_by_y = pd.read_sql("SELECT years, ROUND(AVG(salary)) From new_vac_with_dif_currencies GROUP BY years", con)
+salaries_by_year = dict(s_groups_by_y[["years", "ROUND(AVG(salary))"]].to_dict("split")["data"])
 
-# По городам
-vacancies = len(df)
-df["count"] = df.groupby("area_name")['area_name'].transform("count")
-df_norm = df[df['count'] >= 0.01 * vacancies]
-cities = list(df_norm["area_name"].unique())
-others = len(df[df['count'] < 0.01 * vacancies]) / vacancies
+# Динамика количества вакансий по годам
+v_groups_by_y = pd.read_sql("SELECT years, COUNT(name) From new_vac_with_dif_currencies GROUP BY years", con)
+vacancies_by_year = dict(v_groups_by_y[["years", "COUNT(name)"]].to_dict("split")["data"])
 
-for city in cities:
-    df_s = df_norm[df_norm['area_name'] == city]
-    salaries_areas[city] = int(df_s['salary'].mean())
-    vacancies_areas[city] = round(len(df_s) / len(df), 4)
+# Динамика уровня зарплат по годам для выбранной профессии
+i_v_s_groups_by_y = pd.read_sql("SELECT years, ROUND(AVG(salary)) From new_vac_with_dif_currencies "
+                                "WHERE name LIKE :vac "
+                                "GROUP BY years", con, params=[vac])
+inp_vacancy_salary = dict(i_v_s_groups_by_y[["years", "ROUND(AVG(salary))"]].to_dict("split")["data"])
 
-# По годам
-df_vac = df[df["name"].str.contains(vac)]
-for year in years:
-    df_v_s = df_vac[df_vac['years'] == year]
-    if not df_v_s.empty:
-        inp_vacancy_salary[year] = int(df_v_s['salary'].mean())
-        inp_vacancy_count[year] = len(df_v_s)
+# Динамика количества вакансий по годам для выбранной профессии
+i_v_c_groups_by_y = pd.read_sql("SELECT years, COUNT(name) From new_vac_with_dif_currencies "
+                                "WHERE name LIKE :vac "
+                                "GROUP BY years", con, params=[vac])
+inp_vacancy_count = dict(i_v_c_groups_by_y[["years", "COUNT(name)"]].to_dict("split")["data"])
 
-# Вывод
-print("Динамика уровня зарплат по годам:", sort_dict(salaries_by_year))
-print("Динамика количества вакансий по годам:", sort_dict(vacancies_by_year))
-print("Динамика уровня зарплат по годам для выбранной профессии:", sort_dict(inp_vacancy_salary))
-print("Динамика количества вакансий по годам для выбранной профессии:", sort_dict(inp_vacancy_count))
-print("Уровень зарплат по городам (в порядке убывания):", sort_area_dict(salaries_areas))
-print("Доля вакансий по городам (в порядке убывания):", sort_area_dict(vacancies_areas))
+# Уровень зарплат по городам (в порядке убывания)
+s_a_groups_by_c = pd.read_sql("SELECT area_name, ROUND(AVG(salary)), COUNT(area_name) From new_vac_with_dif_currencies "
+                              "GROUP BY area_name "
+                              "ORDER BY COUNT(area_name) DESC ", con)
 
+s_a_groups_by_c = s_a_groups_by_c[s_a_groups_by_c["COUNT(area_name)"] >= 0.01 * database_length]
+salaries_areas = dict(s_a_groups_by_c[["area_name", "ROUND(AVG(salary))"]].to_dict("split")["data"])
+salaries_areas = sort_area_dict(salaries_areas)
+
+# Доля вакансий по городам (в порядке убывания)
+v_a_groups_by_c = pd.read_sql("SELECT area_name, COUNT(area_name) From new_vac_with_dif_currencies "
+                              "GROUP BY area_name "
+                              "ORDER BY COUNT(area_name) DESC "
+                              "LIMIT 10", con)
+v_a_groups_by_c["COUNT(area_name)"] = round(v_a_groups_by_c["COUNT(area_name)"] / database_length * 100, 2)
+vacancies_areas = dict(v_a_groups_by_c[["area_name", 'COUNT(area_name)']].to_dict("split")["data"])
+
+print("Динамика уровня зарплат по годам:", salaries_by_year)
+print("Динамика количества вакансий по годам:", vacancies_by_year)
+print("Динамика уровня зарплат по годам для выбранной профессии:", inp_vacancy_salary)
+print("Динамика количества вакансий по годам для выбранной профессии:", inp_vacancy_count)
+print("Уровень зарплат по городам (в порядке убывания):", salaries_areas)
+print("Доля вакансий по городам (в порядке убывания):", vacancies_areas)

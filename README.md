@@ -122,4 +122,5 @@ new_data = int(year)
 
 Результат вывода, код и БД
 
-![image](https://user-images.githubusercontent.com/103418173/209805777-cb5cd450-afea-4d1b-b8fb-1edb47a1d0fc.png)
+![image](https://user-images.githubusercontent.com/103418173/209953718-eb13e2b0-b976-4a97-bcf9-408c13849267.png)
+

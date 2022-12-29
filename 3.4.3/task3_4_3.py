@@ -135,6 +135,7 @@ salaries_areas, vacancies_areas, inp_vacancy_salary, inp_vacancy_count = {}, {},
 df_date = pd.read_csv("CB_Currency.csv")
 df["salary"] = df.apply(lambda row: get_salary(row["salary_from"], row["salary_to"], row["salary_currency"],
                                                row["published_at"][:7].split("-")), axis=1)
+df = df[df["salary"].notnull()]
 
 # По городам
 vacancies = len(df)

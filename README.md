@@ -116,7 +116,7 @@ new_data = int(year)
 
 Получившаяся база данных по вакансиям
 
-![image](https://user-images.githubusercontent.com/103418173/209772796-436e7d14-7cbd-469a-a988-ba8e20da07f2.png)
+![image](https://user-images.githubusercontent.com/103418173/209953094-7592b6ae-003a-4f95-aebd-91e47832af8d.png)
 
 3.5.3
 
